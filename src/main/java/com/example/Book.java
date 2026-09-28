@@ -1,5 +1,7 @@
 package com.example;
 
+import java.util.Objects;
+
 public class Book {
 
     private String title;
@@ -7,29 +9,30 @@ public class Book {
     private int year;
     private String genre;
     private boolean finished;
-    private double rating;
+    private int rating;
     private int bookId;
 
-    public Book(String title, String author, int year, String genre, int bookId){
-        this.title = title;
-        this.author = author;
-        this.year = year;
-        this.genre = genre;
-        this.bookId = bookId;
+    public Book(String title, String author, int year, String genre, int bookId) {
+        this(title, author, year, genre, bookId, false, 0);
     }
 
-    public Book(String title, String author, int year, String genre, int bookId, boolean finished, double rating){
-        this.title = title;
-        this.author = author;
-        this.year = year;
-        this.genre = genre;
-        this.finished = finished;
-        this.rating = rating;
-        this.bookId = bookId;
+    public Book(String title, String author, int year, String genre, int bookId, boolean finished, int rating) {
 
+        setTitle(title);
+        setAuthor(author);
+        setYear(year);
+        setGenre(genre);
+        setBookId(bookId);
+        setFinished(finished);
+
+        if (finished) {
+            setRating(rating);
+        } else {
+            this.rating = 0;
+        }
     }
 
-    public double getRating() {
+    public int getRating() {
         return rating;
     }
 
@@ -49,8 +52,17 @@ public class Book {
         return title;
     }
 
+    public int getBookId() {
+        return bookId;
+    }
+
     public void setAuthor(String author) {
-        this.author = author;
+
+        if (author != null && !author.trim().isEmpty()) {
+            this.author = author;
+        } else {
+            throw new IllegalArgumentException("Felaktigt namn");
+        }
     }
 
     public void setFinished(boolean finished) {
@@ -58,33 +70,61 @@ public class Book {
     }
 
     public void setGenre(String genre) {
-        this.genre = genre;
+        if (genre != null && !genre.trim().isEmpty()) {
+            this.genre = genre;
+        } else {
+            throw new IllegalArgumentException("Felaktig genre");
+        }
     }
 
-    public void setRating(double rating) {
-        this.rating = rating;
+    public void setRating(int rating) {
+
+        if (rating <= 5 && rating >= 1) {
+            this.rating = rating;
+        } else {
+            throw new IllegalArgumentException("Felaktig rating");
+        }
     }
 
     public void setTitle(String title) {
-        this.title = title;
+
+        if (title != null && !title.trim().isEmpty()) {
+            this.title = title;
+        } else {
+            throw new IllegalArgumentException("Felaktig titel");
+        }
     }
 
     public void setYear(int year) {
         this.year = year;
     }
 
-    @Override
-    public String toString() {
-        return super.toString();
+    public void setBookId(int bookId) {
+        this.bookId = bookId;
     }
 
     @Override
-    public boolean equals(Object obj) {
-        return super.equals(obj);
+    public String toString() {
+        return "Book{" +
+                "title='" + title + '\'' +
+                ", author='" + author + '\'' +
+                ", year=" + year +
+                ", genre='" + genre + '\'' +
+                ", finished=" + finished +
+                ", rating=" + rating +
+                ", bookId=" + bookId +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Book book = (Book) o;
+        return bookId == book.bookId;
     }
 
     @Override
     public int hashCode() {
-        return super.hashCode();
+        return Objects.hashCode(bookId);
     }
 }
