@@ -32,6 +32,10 @@ public class Book {
         }
     }
 
+    public boolean isFinished() {
+        return finished;
+    }
+
     public int getRating() {
         return rating;
     }
