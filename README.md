@@ -1,41 +1,33 @@
 # Libra - Book Management & Tracking System
 
-A full-stack Java web application built with Spring Boot and Thymeleaf. The application allows users to manage a personal book library, track reading progress and rate books.
-
-This project demonstrates core Java principles, Object-Oriented Programming (OOP), clean 3-layer architecture, and server-side rendering using modern Spring MVC patterns.
+A Java web application built with Spring Boot and Thymeleaf to track personal books, reading status, and ratings.
 
 ---
 
 ## Features
 
-- Book Catalog Management: Add new books with detailed metadata (Title, Author, Publication Year, Genre).
-- Reading Tracker: Mark books as read/unread and assign ratings (1–5 Stars).
-- Library Actions: Delete books or update ratings dynamically from the UI.
-- Server-Side Rendering: Clean HTML/CSS interface rendered using Thymeleaf template engine.
+- **Book Catalog:** Add new books with title, author, publication year, and genre.
+- **Reading Tracker:** Mark books as finished or unread and assign ratings (1–5 stars).
+- **Library Actions:** Delete books or update ratings directly from the UI.
+- **User Interface:** Clean HTML/CSS interface rendered with Thymeleaf.
 
 ---
 
-## Architecture & Tech Stack
+## Tech Stack
 
-### Tech Stack
-- Language: Java 25
-- Framework: Spring Boot 3.2.4 (Spring MVC)
-- Template Engine: Thymeleaf
-- Build Tool: Maven
-- In-Memory Storage: Domain Services (ArrayList-backed)
-
-### Design Patterns & Principles
-- Three-Layer Architecture: Separation of concerns into Domain Models, Service Layer, and Web Controllers.
-- Dependency Injection (DI): Constructor-based injection (final dependencies) for thread safety and immutability.
-- Encapsulation & Domain Validation: Robust setters and domain validation ensuring invalid data is rejected at the model level.
+- **Language:** Java 25
+- **Framework:** Spring Boot 3.2.4
+- **Database & ORM:** Spring Data JPA, H2 (for development), and Flyway (for schema migrations)
+- **Frontend:** Thymeleaf + HTML/CSS
+- **Build Tool:** Maven
 
 ---
 
 ## Getting Started
 
 ### Prerequisites
-- JDK: Java 17 or higher (Java 25 supported)
-- Build Tool: Maven
+- JDK 17 or higher (running on Java 25)
+- Maven (included via ./mvnw)
 
 ### Running the Application
 
@@ -47,35 +39,34 @@ This project demonstrates core Java principles, Object-Oriented Programming (OOP
    ./mvnw spring-boot:run
 
 3. Open in browser:
-   Navigate to http://localhost:8080/books in your web browser.
+   Navigate to http://localhost:8080/books
 
 ---
 
-## Roadmap & To-Do List
+## Roadmap & Progress
 
-- [x] Phase 1: Core Domain & Web MVC Interface
-    - [x] Implement robust Book domain model with validation & B.C. date formatting.
-    - [x] Build BookCollection service using in-memory collection.
-    - [x] Implement BookController with Spring MVC routing (@GetMapping, @PostMapping).
+- [x] **Phase 1: Core MVC Setup**
+    - [x] Create Book domain model with validation.
+    - [x] Implement in-memory BookCollection service (ArrayList).
+    - [x] Create BookController for web routing (@GetMapping, @PostMapping).
     - [x] Render UI using Thymeleaf (books.html).
 
-- [ ] Phase 2: Database Integration (Spring Data JPA & SQL)
-    - [ ] Add Spring Data JPA and H2/PostgreSQL dependencies.
-    - [ ] Map Book domain model to a relational database table using @Entity.
-    - [ ] Replace in-memory BookCollection with a Spring Data BookRepository.
-    - [ ] Implement database migrations (Flyway or Liquibase).
+- [x] **Phase 2: Database Integration (Spring Data JPA & SQL)**
+    - [x] Add Spring Data JPA and H2 database dependencies.
+    - [x] Annotate Book as a JPA @Entity.
+    - [x] Replace ArrayList with Spring Data BookRepository.
+    - [x] Implement Flyway database migrations (V1__create_book_table.sql).
 
-- [ ] Phase 3: User Authentication & Security (Spring Security)
-    - [ ] Integrate Spring Security framework.
-    - [ ] Create User and Role entities with password hashing (BCrypt).
-    - [ ] Implement registration and login/logout views.
-    - [ ] Associate book collections directly with individual user accounts.
+- [ ] **Phase 3: User Authentication & Security (Spring Security)**
+    - [ ] Add Spring Security dependency.
+    - [ ] Create User and Role entities with hashed passwords (BCrypt).
+    - [ ] Add login and registration pages.
+    - [ ] Link book collections to individual user accounts.
 
-- [ ] Phase 4: REST API Expansion
-    - [ ] Expose RESTful endpoints (/api/v1/books) returning JSON format.
-    - [ ] Implement HTTP status code handling (200 OK, 201 Created, 404 Not Found, 400 Bad Request).
-    - [ ] Add OpenAPI / Swagger documentation (/swagger-ui.html).
-    - [ ] Prepare backend for potential single-page frontend (React/Vue).
+- [ ] **Phase 4: Database Migration (PostgreSQL / MySQL)**
+    - [ ] Set up a production-ready database (PostgreSQL or MySQL via Docker).
+    - [ ] Update application.properties and database drivers.
+    - [ ] Adapt Flyway scripts for the production database.
 
 ---
 
