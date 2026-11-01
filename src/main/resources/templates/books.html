@@ -2,91 +2,87 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>My Books - Libra</title>
+    <title>Mina Böcker - Libra</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 40px; background-color: #f4f4f9; }
-        h1, h2 { color: #333; }
-        form { background: #fff; padding: 20px; border-radius: 8px; margin-bottom: 30px; max-width: 500px; }
+        body { font-family: system-ui, -apple-system, sans-serif; margin: 40px; background-color: #f7fafc; color: #2d3748; }
+        h1, h2 { color: #1a202c; }
+
+        .card-form { background: #fff; padding: 20px; border-radius: 8px; margin-bottom: 30px; max-width: 500px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+
         .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
-        .form-group input { width: 100%; padding: 8px; box-sizing: border-box; }
-        button { background-color: #2e7d32; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; }
-        button:hover { background-color: #1b5e20; }
-        table { width: 100%; border-collapse: collapse; background: #fff; }
-        th, td { padding: 12px; border: 1px solid #ddd; text-align: left; }
-        th { background-color: #f2f2f2; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; color: #4a5568; }
+        .form-group input { width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 14px; }
+
+        button { background-color: #2b6cb0; color: white; padding: 10px 15px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px; transition: background 0.2s; }
+        button:hover { background-color: #2c5282; }
+
+        table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        th, td { padding: 12px; border: 1px solid #e2e8f0; text-align: left; }
+        th { background-color: #edf2f7; color: #4a5568; font-weight: 600; }
+
         .inline-form { display: inline-block; margin: 0; padding: 0; background: none; }
-        .btn-delete { background-color: #c62828; }
-        .btn-delete:hover { background-color: #8e0000; }
+        .btn-delete { background-color: #e53e3e; }
+        .btn-delete:hover { background-color: #c53030; }
     </style>
 </head>
 <body>
 
-<h1>My Book Library</h1>
+<div style="display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 2px solid #e2e8f0; margin-bottom: 20px;">
+    <h3 style="margin: 0; color: #2d3748;">Välkommen, <span th:text="${username}" style="color: #2b6cb0;">Användare</span>!</h3>
 
-<h2>Add New Book</h2>
-<form th:action="@{/books/add}" method="post">
+    <form th:action="@{/logout}" method="post" style="margin: 0; background: none; padding: 0;">
+        <button type="submit" style="background-color: #e53e3e;">
+            Logga ut
+        </button>
+    </form>
+</div>
+
+<h1>Mitt Bokbibliotek</h1>
+
+<h2>Lägg till ny bok</h2>
+
+<form th:action="@{/books}" method="post" class="card-form">
     <div class="form-group">
-        <label for="title">Title:</label>
+        <label for="title">Titel:</label>
         <input type="text" id="title" name="title" required>
     </div>
     <div class="form-group">
-        <label for="author">Author:</label>
+        <label for="author">Författare:</label>
         <input type="text" id="author" name="author" required>
     </div>
     <div class="form-group">
-        <label for="year">Publication Year (use negative for B.C.):</label>
+        <label for="year">Utgivningsår (använd minus för f.Kr.):</label>
         <input type="number" id="year" name="year" required>
     </div>
     <div class="form-group">
         <label for="genre">Genre:</label>
         <input type="text" id="genre" name="genre" required>
     </div>
-    <button type="submit">Save Book</button>
+    <button type="submit">Spara bok</button>
 </form>
 
-<h2>All Books</h2>
+<h2>Alla böcker</h2>
 <table>
     <thead>
     <tr>
         <th>ID</th>
-        <th>Title</th>
-        <th>Author</th>
-        <th>Year</th>
+        <th>Titel</th>
+        <th>Författare</th>
+        <th>År</th>
         <th>Genre</th>
-        <th>Status</th>
-        <th>Rating</th>
-        <th>Actions</th>
+        <th>Åtgärder</th>
     </tr>
     </thead>
     <tbody>
     <tr th:each="book : ${books}">
         <td th:text="${book.bookId}">1</td>
-        <td th:text="${book.title}">Title</td>
-        <td th:text="${book.author}">Author</td>
-        <td th:text="${book.year < 0} ? ${-book.year} + ' B.C.' : ${book.year}">2024</td>
+        <td th:text="${book.title}">Titel</td>
+        <td th:text="${book.author}">Författare</td>
+        <td th:text="${book.year < 0} ? ${-book.year} + ' f.Kr.' : ${book.year}">2024</td>
         <td th:text="${book.genre}">Genre</td>
         <td>
-            <span th:if="${book.finished}">Read</span>
-            <span th:unless="${book.finished}">Unread</span>
-        </td>
-        <td th:text="${book.rating > 0} ? ${book.rating} + ' / 5' : 'Not rated'">-</td>
-        <td>
-            <form th:action="@{/books/rate}" method="post" class="inline-form">
-                <input type="hidden" name="bookId" th:value="${book.bookId}">
-                <select name="rating" required>
-                    <option value="1">1 Star</option>
-                    <option value="2">2 Stars</option>
-                    <option value="3">3 Stars</option>
-                    <option value="4">4 Stars</option>
-                    <option value="5">5 Stars</option>
-                </select>
-                <button type="submit">Rate</button>
-            </form>
-
-            <form th:action="@{/books/delete}" method="post" class="inline-form">
-                <input type="hidden" name="bookId" th:value="${book.bookId}">
-                <button type="submit" class="btn-delete">Delete</button>
+            <form th:action="@{/books/delete/{id}(id=${book.bookId})}" method="post" class="inline-form">
+                <button type="submit" class="btn-delete">Ta bort</button>
             </form>
         </td>
     </tr>
