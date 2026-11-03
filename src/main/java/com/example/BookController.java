@@ -1,10 +1,8 @@
 package com.example;
 
-import com.example.Book;
-import com.example.User;
-import com.example.BookRepository;
-import com.example.UserRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -23,44 +21,89 @@ public class BookController {
         this.userRepository = userRepository;
     }
 
-    // för att hämta den inloggade användaren från databasen
-    private User getLoggedInUser(Authentication authentication) {
+    // Hjälpmetod för att hämta användaren eller rensa sessionen om databasen startats om
+    private User getAuthenticatedUser(Authentication authentication, HttpServletRequest request) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return null;
+        }
+
         String username = authentication.getName();
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Inloggad användare hittades inte"));
+        return userRepository.findByUsername(username).orElseGet(() -> {
+            // Om sessionen finns i webbläsaren men användaren raderats ur H2 vid omstart:
+            SecurityContextHolder.clearContext();
+            if (request != null && request.getSession(false) != null) {
+                request.getSession().invalidate();
+            }
+            return null;
+        });
     }
 
     @GetMapping
-    public String listBooks(Model model, Authentication authentication) {
-        User currentUser = getLoggedInUser(authentication);
+    public String listBooks(Model model, Authentication authentication, HttpServletRequest request) {
+        User user = getAuthenticatedUser(authentication, request);
+        if (user == null) {
+            return "redirect:/login";
+        }
 
-        // inloggade användarens böcker
-        List<Book> userBooks = bookRepository.findByUser(currentUser);
-
+        List<Book> userBooks = bookRepository.findByUser(user);
         model.addAttribute("books", userBooks);
-        model.addAttribute("newBook", new Book());
-        model.addAttribute("username", currentUser.getUsername());
+        model.addAttribute("username", user.getUsername());
         return "books";
     }
 
     @PostMapping
-    public String addBook(@ModelAttribute Book book, Authentication authentication) {
-        User currentUser = getLoggedInUser(authentication);
+    public String addBook(@RequestParam String title,
+                          @RequestParam String author,
+                          @RequestParam Integer year,
+                          @RequestParam String genre,
+                          Authentication authentication,
+                          HttpServletRequest request) {
 
-        // Kopplar boken till den inloggade användaren
-        book.setUser(currentUser);
+        User user = getAuthenticatedUser(authentication, request);
+        if (user == null) {
+            return "redirect:/login";
+        }
+
+        // Backend-validering
+        String cleanTitle = title != null ? title.trim() : "";
+        String cleanAuthor = author != null ? author.trim() : "";
+        String cleanGenre = genre != null ? genre.trim() : "";
+
+        if (cleanTitle.isEmpty() || cleanTitle.length() > 150) {
+            return "redirect:/books?error=title";
+        }
+        if (cleanAuthor.isEmpty() || cleanAuthor.length() > 100) {
+            return "redirect:/books?error=author";
+        }
+        if (cleanGenre.isEmpty() || cleanGenre.length() > 50) {
+            return "redirect:/books?error=genre";
+        }
+
+        if (year == null || year < -3000 || year > 2100) {
+            return "redirect:/books?error=year";
+        }
+
+        Book book = new Book();
+        book.setTitle(cleanTitle);
+        book.setAuthor(cleanAuthor);
+        book.setYear(year);
+        book.setGenre(cleanGenre);
+        book.setUser(user);
+
         bookRepository.save(book);
-
         return "redirect:/books";
     }
 
     @PostMapping("/delete/{id}")
-    public String deleteBook(@PathVariable Integer id, Authentication authentication) {
-        User currentUser = getLoggedInUser(authentication);
+    public String deleteBook(@PathVariable Integer id, Authentication authentication, HttpServletRequest request) {
+        User user = getAuthenticatedUser(authentication, request);
+        if (user == null) {
+            return "redirect:/login";
+        }
 
-        // Radera bara om boken faktiskt tillhör den inloggade användaren
+        // Radera endast om boken tillhör den inloggade användaren
         bookRepository.findById(id).ifPresent(book -> {
-            if (book.getUser().getId().equals(currentUser.getId())) {
+            if (book.getUser().getId().equals(user.getId())) {
                 bookRepository.delete(book);
             }
         });

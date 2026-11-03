@@ -83,6 +83,10 @@
         Du har loggats ut.
     </div>
 
+    <div th:if="${param.registered}" style="color: #38a169; margin-bottom: 15px; font-size: 14px; text-align: center;">
+        Ditt konto har skapats! Du kan nu logga in.
+    </div>
+
     <form th:action="@{/login}" method="post">
         <div class="form-group">
             <label for="username">Användarnamn</label>
